@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>溶液与分子盒参数计算器</title>
+    <style>
+        :root {
+            --primary-color: #0055aa;
+            --primary-hover: #003d7a;
+            --bg-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-color: #e0e6ed;
+            --secondary-bg: #e9ecef;
+            --secondary-hover: #dae0e5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+
+        .calculator-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 540px;
+            padding: 24px 28px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.4rem;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .tip-text {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.4;
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px dashed var(--border-color);
+        }
+
+        .section-box {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 12px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid #eef2f7;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .field-group {
+            display: grid;
+            grid-template-columns: 140px 1fr 75px;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .field-group label {
+            font-size: 0.85rem;
+            text-align: right;
+            color: #444;
+        }
+
+        .field-group input {
+            width: 100%;
+            padding: 6px 10px;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .field-group input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 85, 170, 0.15);
+        }
+
+        .field-group .note {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-group-secondary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-bg);
+            color: #333;
+            font-size: 0.82rem;
+            padding: 8px 4px;
+            font-weight: normal;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        @media (max-width: 480px) {
+            .calculator-card {
+                padding: 16px;
+            }
+            .field-group {
+                grid-template-columns: 110px 1fr 60px;
+                gap: 4px;
+            }
+            .field-group label {
+                font-size: 0.8rem;
+            }
+            .btn-group-secondary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator-card">
+    <h1>溶液与分子盒参数计算器</h1>
+    <div class="tip-text">
+        提示：必须填入溶质和溶剂的分子量。<br>之后填入任意 2 个不关联变量即可求解其余参数。
+    </div>
+
+    <div class="section-box">
+        <!-- 溶质部分 -->
+        <div class="section-title">--- 溶质 (Solute) ---</div>
+        <div class="field-group">
+            <label for="mw_solute">溶质分子量 (g/mol):</label>
+            <input type="number" step="any" id="mw_solute">
+            <span class="note" style="color:#d9534f; font-weight:bold;">必需</span>
+        </div>
+        <div class="field-group">
+            <label for="n_solute">溶质分子数量 (个):</label>
+            <input type="number" step="any" id="n_solute">
+            <span class="note"></span>
+        </div>
+        <div class="field-group">
+            <label for="moles_solute">溶质物质的量 (mol):</label>
+            <input type="number" step="any" id="moles_solute">
+            <span class="note"></span>
+        </div>
+        <div class="field-group">
+            <label for="mass_solute">溶质质量 (g):</label>
+            <input type="number" step="any" id="mass_solute">
+            <span class="note"></span>
+        </div>
+
+        <!-- 溶剂部分 -->
+        <div class="section-title">--- 溶剂 (Solvent) ---</div>
+        <div class="field-group">
+            <label for="mw_solvent">溶剂分子量 (g/mol):</label>
+            <input type="number" step="any" id="mw_solvent">
+            <span class="note" style="color:#d9534f; font-weight:bold;">必需</span>
+        </div>
+        <div class="field-group">
+            <label for="n_solvent">溶剂分子数量 (个):</label>
+            <input type="number" step="any" id="n_solvent">
+            <span class="note"></span>
+        </div>
+        <div class="field-group">
+            <label for="moles_solvent">溶剂物质的量 (mol):</label>
+            <input type="number" step="any" id="moles_solvent">
+            <span class="note"></span>
+        </div>
+        <div class="field-group">
+            <label for="mass_solvent">溶剂质量 (g):</label>
+            <input type="number" step="any" id="mass_solvent">
+            <span class="note"></span>
+        </div>
+
+        <!-- 体系特征部分 -->
+        <div class="section-title">--- 体系特征 ---</div>
+        <div class="field-group">
+            <label for="density">体系密度 (g/cm³):</label>
+            <input type="number" step="any" id="density" value="1.0">
+            <span class="note">默认 1.0</span>
+        </div>
+        <div class="field-group">
+            <label for="box_length">立方盒子边长 (nm):</label>
+            <input type="number" step="any" id="box_length">
+            <span class="note"></span>
+        </div>
+        <div class="field-group">
+            <label for="volume_box">体积 (nm³):</label>
+            <input type="number" step="any" id="volume_box">
+            <span class="note"></span>
+        </div>
+        <div class="field-group">
+            <label for="mass_fraction_permil">质量分数 (‰):</label>
+            <input type="number" step="any" id="mass_fraction_permil">
+            <span class="note">千分之一</span>
+        </div>
+        <div class="field-group">
+            <label for="concentration">摩尔浓度 (mol/L):</label>
+            <input type="number" step="any" id="concentration">
+            <span class="note"></span>
+        </div>
+    </div>
+
+    <!-- 按钮区域 -->
+    <div class="btn-container">
+        <button class="btn btn-primary" onclick="calculate()">求解缺失信息</button>
+        <div class="btn-group-secondary">
+            <button class="btn btn-secondary" onclick="clearAll()">清空全部</button>
+            <button class="btn btn-secondary" onclick="clearSolute()">清空溶质</button>
+            <button class="btn btn-secondary" onclick="clearSolvent()">清空溶剂</button>
+            <button class="btn btn-secondary" onclick="clearSystem()">清空体系</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const NA = 6.02214076e23;
+
+    function getValue(id) {
+        return document.getElementById(id).value.trim();
+    }
+
+    function setValue(id, val) {
+        document.getElementById(id).value = val;
+    }
+
+    function parseFloatOrNull(id) {
+        const val = getValue(id);
+        if (val === "") return null;
+        const res = parseFloat(val);
+        return (!isNaN(res) && res > 0) ? res : null;
+    }
+
+    function clearSolute() {
+        setValue("n_solute", "");
+        setValue("moles_solute", "");
+        setValue("mass_solute", "");
+    }
+
+    function clearSolvent() {
+        setValue("n_solvent", "");
+        setValue("moles_solvent", "");
+        setValue("mass_solvent", "");
+    }
+
+    function clearSystem() {
+        setValue("box_length", "");
+        setValue("volume_box", "");
+        setValue("mass_fraction_permil", "");
+        setValue("concentration", "");
+    }
+
+    function clearAll() {
+        clearSolute();
+        clearSolvent();
+        clearSystem();
+        setValue("mw_solute", "");
+        setValue("mw_solvent", "");
+        setValue("density", "1.0");
+    }
+
+    function calculate() {
+        const mw1 = parseFloatOrNull("mw_solute");
+        const mw2 = parseFloatOrNull("mw_solvent");
+        const rho = parseFloatOrNull("density") || 1.0;
+
+        if (!mw1 || !mw2) {
+            alert("输入错误：请必须提供溶质和溶剂的分子量（必须大于0）！");
+            return;
+        }
+
+        let m1 = parseFloatOrNull("mass_solute");
+        let n1 = parseFloatOrNull("n_solute");
+        let mol1 = parseFloatOrNull("moles_solute");
+
+        let m2 = parseFloatOrNull("mass_solvent");
+        let n2 = parseFloatOrNull("n_solvent");
+        let mol2 = parseFloatOrNull("moles_solvent");
+
+        let L = parseFloatOrNull("box_length");
+        let V_nm3 = parseFloatOrNull("volume_box");
+
+        let w_permil = parseFloatOrNull("mass_fraction_permil");
+        let c = parseFloatOrNull("concentration");
+
+        let changed = true;
+        const max_loops = 20;
+        let loop = 0;
+
+        while (changed && loop < max_loops) {
+            changed = false;
+            loop++;
+
+            if (m1 === null && mol1 !== null) { m1 = mol1 * mw1; changed = true; }
+            if (m1 === null && n1 !== null) { mol1 = n1 / NA; m1 = mol1 * mw1; changed = true; }
+            if (mol1 === null && m1 !== null) { mol1 = m1 / mw1; changed = true; }
+            if (n1 === null && mol1 !== null) { n1 = mol1 * NA; changed = true; }
+
+            if (m2 === null && mol2 !== null) { m2 = mol2 * mw2; changed = true; }
+            if (m2 === null && n2 !== null) { mol2 = n2 / NA; m2 = mol2 * mw2; changed = true; }
+            if (mol2 === null && m2 !== null) { mol2 = m2 / mw2; changed = true; }
+            if (n2 === null && mol2 !== null) { n2 = mol2 * NA; changed = true; }
+
+            if (V_nm3 === null && L !== null) { V_nm3 = Math.pow(L, 3); changed = true; }
+            if (L === null && V_nm3 !== null) { L = Math.cbrt(V_nm3); changed = true; }
+
+            if (m1 !== null && m2 !== null) {
+                const m_total = m1 + m2;
+                const V_cm3 = m_total / rho;
+                if (V_nm3 === null) {
+                    V_nm3 = V_cm3 * 1e21;
+                    changed = true;
+                }
+            }
+
+            if (V_nm3 !== null) {
+                const m_total = (V_nm3 / 1e21) * rho;
+                if (m1 !== null && m2 === null) { m2 = m_total - m1; changed = true; }
+                else if (m2 !== null && m1 === null) { m1 = m_total - m2; changed = true; }
+            }
+
+            if (w_permil !== null) {
+                const w = w_permil / 1000.0;
+                if (m1 !== null && m2 === null) { m2 = m1 * (1 - w) / w; changed = true; }
+                else if (m2 !== null && m1 === null) { m1 = m2 * w / (1 - w); changed = true; }
+                else if (V_nm3 !== null && m1 === null) {
+                    const m_total = (V_nm3 / 1e21) * rho;
+                    m1 = m_total * w;
+                    changed = true;
+                }
+            }
+
+            if (m1 !== null && m2 !== null && w_permil === null) {
+                w_permil = (m1 / (m1 + m2)) * 1000.0;
+                changed = true;
+            }
+
+            if (c !== null) {
+                if (V_nm3 !== null && mol1 === null) {
+                    mol1 = c * (V_nm3 * 1e-24);
+                    changed = true;
+                } else if (mol1 !== null && V_nm3 === null) {
+                    V_nm3 = (mol1 / c) * 1e24;
+                    changed = true;
+                } else if (m2 !== null && m1 === null) {
+                    const denom = 1000.0 * rho - c * mw1;
+                    if (denom > 0) {
+                        m1 = (c * mw1 * m2) / denom;
+                        changed = true;
+                    } else {
+                        alert("数值物理错误：输入的浓度对于当前密度和溶质分子量而言过高（物理上不可能实现）！");
+                        return;
+                    }
+                }
+            }
+
+            if (mol1 !== null && V_nm3 !== null && c === null) {
+                c = mol1 / (V_nm3 * 1e-24);
+                changed = true;
+            }
+        }
+
+        function fmt(val, precision = 4) {
+            if (val === null || val === undefined) return "";
+            if (val >= 1e6 || (val < 1e-3 && val > 0)) {
+                return val.toExponential(precision);
+            }
+            return Number(val.toFixed(precision)).toString();
+        }
+
+        setValue("mw_solute", fmt(mw1));
+        setValue("mw_solvent", fmt(mw2));
+        setValue("density", fmt(rho));
+
+        setValue("n_solute", fmt(n1, 2));
+        setValue("moles_solute", fmt(mol1, 6));
+        setValue("mass_solute", fmt(m1, 6));
+
+        setValue("n_solvent", fmt(n2, 2));
+        setValue("moles_solvent", fmt(mol2, 6));
+        setValue("mass_solvent", fmt(m2, 6));
+
+        setValue("box_length", fmt(L, 4));
+        setValue("volume_box", fmt(V_nm3, 4));
+        setValue("mass_fraction_permil", fmt(w_permil, 4));
+        setValue("concentration", fmt(c, 4));
+    }
+</script>
+
+</body>
+</html>
