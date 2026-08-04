@@ -30,7 +30,7 @@
 
 ##
 
-**相关网站**：色彩空间转换与可视化工具
+**其它相关链接**：色彩空间转换与可视化工具
 
 https://zq-moonlight.github.io/cie1931-color-converter/
 
