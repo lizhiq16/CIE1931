@@ -4,6 +4,8 @@
 
 **渲染引擎**：原生 JavaScript + HTML5 Canvas API，无第三方库依赖。
 
+**访问链接**：https://lizhiq16.github.io/CIE1931/CIE1931.html
+
 ## ✨ 主要功能
 
 *   **📊 动态可视化**：基于 HTML5 Canvas 实时渲染 CIE 1931 色度图，支持平滑缩放和重绘。
