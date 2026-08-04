@@ -27,3 +27,9 @@
 ## 📝 许可与声明
 
 本工具仅供教育和参考使用。色度计算基于标准数学模型，实际色彩管理应用请以专业硬件测量为准。
+
+**相关网站**：色彩空间转换与可视化工具
+
+https://zq-moonlight.github.io/cie1931-color-converter/
+
+一个无依赖的纯 Vanilla JS 前端 CIE 1931 色彩空间转换与可视化工具。支持从 RGB 到 XYZ、xyY、CIELAB、LCH、CIELUV 及 CCT 的完整计算链路，配备交互式 CIE 1931 色度图、动态色域三角、色域溢出警告与色度适应变换 (Chromatic Adaptation) 功能。
