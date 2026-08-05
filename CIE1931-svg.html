@@ -239,7 +239,7 @@
 
 <div class="container">
     <div class="panel">
-        <h1>CIE 1931 控制台 (html SVG)</h1>
+        <h1>CIE 1931 控制台 (SVG绘图版)</h1>
 
         <div class="section-title">1. 图形与坐标系设置</div>
         <div class="control-group">
@@ -274,7 +274,7 @@
         </div>
         <div class="input-row">
             <label for="numCanvasHeight">画布高度:</label>
-            <input type="number" id="numCanvasHeight" value="850" min="400" max="2400" step="50">
+            <input type="number" id="numCanvasHeight" value="900" min="400" max="2400" step="50">
         </div>
         <div class="input-row">
             <label for="numTitleFontSize">主标题字体:</label>
@@ -282,7 +282,7 @@
         </div>
         <div class="input-row">
             <label for="numAxisFontSize">坐标轴字体:</label>
-            <input type="number" id="numAxisFontSize" value="12" min="8" max="30">
+            <input type="number" id="numAxisFontSize" value="17" min="8" max="30">
         </div>
         <div class="input-row">
             <label for="numWavelengthFontSize">波长标注:</label>
@@ -290,7 +290,7 @@
         </div>
         <div class="input-row">
             <label for="numPointFontSize">标记点字体:</label>
-            <input type="number" id="numPointFontSize" value="12" min="8" max="30">
+            <input type="number" id="numPointFontSize" value="13" min="8" max="30">
         </div>
 
         <div class="section-title">3. 标准色域叠加</div>
@@ -329,7 +329,7 @@
     </div>
 
     <div class="svg-container">
-        <svg id="cieSvg" width="800" height="850" xmlns="http://www.w3.org/2000/svg"></svg>
+        <svg id="cieSvg" width="800" height="900" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
 </div>
 
@@ -856,9 +856,9 @@ function draw() {
     svg.innerHTML = '';
 
     const titleFontSize = parseInt(document.getElementById('numTitleFontSize').value) || 20;
-    const axisFontSize = parseInt(document.getElementById('numAxisFontSize').value) || 12;
+    const axisFontSize = parseInt(document.getElementById('numAxisFontSize').value) || 17;
     const wavelengthFontSize = parseInt(document.getElementById('numWavelengthFontSize').value) || 10;
-    const pointFontSize = parseInt(document.getElementById('numPointFontSize').value) || 12;
+    const pointFontSize = parseInt(document.getElementById('numPointFontSize').value) || 13;
 
     const showGrid = document.getElementById('chkShowGrid').checked;
     const showAxes = document.getElementById('chkShowAxes').checked;
