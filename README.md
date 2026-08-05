@@ -4,7 +4,7 @@
 
 **渲染引擎**：原生 JavaScript + HTML5 Canvas API，无第三方库依赖。
 
-**访问链接**：https://lizhiq16.github.io/CIE1931/CIE1931-svg.html
+**访问链接**：https://lizhiq16.github.io/CIE1931/CIE1931.html
 
 ## ✨ 主要功能
 
