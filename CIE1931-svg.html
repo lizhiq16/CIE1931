@@ -274,7 +274,7 @@
         </div>
         <div class="input-row">
             <label for="numCanvasHeight">画布高度:</label>
-            <input type="number" id="numCanvasHeight" value="900" min="400" max="2400" step="50">
+            <input type="number" id="numCanvasHeight" value="850" min="400" max="2400" step="50">
         </div>
         <div class="input-row">
             <label for="numTitleFontSize">主标题字体:</label>
@@ -329,7 +329,7 @@
     </div>
 
     <div class="svg-container">
-        <svg id="cieSvg" width="800" height="900" xmlns="http://www.w3.org/2000/svg"></svg>
+        <svg id="cieSvg" width="800" height="850" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
 </div>
 
@@ -783,14 +783,14 @@ function isPointInLocus(x, y) {
 const svg = document.getElementById('cieSvg');
 
 let width = 800;
-let height = 900;
+let height = 850;
 let padding = 60;
 let scaleX = (width - 2 * padding) / 0.8;
 let scaleY = (height - 2 * padding) / 0.9;
 
 function updateScale() {
     width = parseInt(document.getElementById('numCanvasWidth').value) || 800;
-    height = parseInt(document.getElementById('numCanvasHeight').value) || 900;
+    height = parseInt(document.getElementById('numCanvasHeight').value) || 850;
     svg.setAttribute('width', width);
     svg.setAttribute('height', height);
     svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
@@ -989,7 +989,7 @@ function draw() {
     // 5. 波长标注
     if (showWavelength) {
         const wlGroup = createSvgElement('g');
-        const targetWavelengths = [380, 460, 470, 480, 490, 500, 510, 520, 530, 540, 550, 560, 570, 580, 590, 600, 620, 700];
+        const targetWavelengths = [430, 460, 470, 480, 490, 500, 510, 520, 530, 540, 550, 560, 570, 580, 590, 600, 610, 620, 630, 700];
         
         locus.forEach(pt => {
             if (targetWavelengths.includes(pt.wl)) {
