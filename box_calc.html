@@ -243,8 +243,8 @@
         <div class="section-title">--- 体系特征 ---</div>
         <div class="field-group">
             <label for="density">体系密度 (g/cm³):</label>
-            <input type="number" step="any" id="density" value="1.0">
-            <span class="note">默认 1.0</span>
+            <input type="number" step="any" id="density" placeholder="不填默认1.0">
+            <span class="note"></span>
         </div>
         <div class="field-group">
             <label for="box_length">立方盒子边长 (nm):</label>
@@ -315,6 +315,11 @@
         setValue("volume_box", "");
         setValue("mass_fraction_permil", "");
         setValue("concentration", "");
+        setValue("moles_solute", "");
+        setValue("mass_solute", "");
+        setValue("moles_solvent", "");
+        setValue("mass_solvent", "");
+        setValue("density", "");
     }
 
     function clearAll() {
@@ -323,18 +328,19 @@
         clearSystem();
         setValue("mw_solute", "");
         setValue("mw_solvent", "");
-        setValue("density", "1.0");
+        setValue("density", "");
     }
 
     function calculate() {
         const mw1 = parseFloatOrNull("mw_solute");
         const mw2 = parseFloatOrNull("mw_solvent");
-        const rho = parseFloatOrNull("density") || 1.0;
 
         if (!mw1 || !mw2) {
             alert("输入错误：请必须提供溶质和溶剂的分子量（必须大于0）！");
             return;
         }
+
+        let rho = parseFloatOrNull("density");
 
         let m1 = parseFloatOrNull("mass_solute");
         let n1 = parseFloatOrNull("n_solute");
@@ -358,39 +364,56 @@
             changed = false;
             loop++;
 
+            // 1. 基础物理量换算（溶质）
             if (m1 === null && mol1 !== null) { m1 = mol1 * mw1; changed = true; }
             if (m1 === null && n1 !== null) { mol1 = n1 / NA; m1 = mol1 * mw1; changed = true; }
             if (mol1 === null && m1 !== null) { mol1 = m1 / mw1; changed = true; }
             if (n1 === null && mol1 !== null) { n1 = mol1 * NA; changed = true; }
 
+            // 2. 基础物理量换算（溶剂）
             if (m2 === null && mol2 !== null) { m2 = mol2 * mw2; changed = true; }
             if (m2 === null && n2 !== null) { mol2 = n2 / NA; m2 = mol2 * mw2; changed = true; }
             if (mol2 === null && m2 !== null) { mol2 = m2 / mw2; changed = true; }
             if (n2 === null && mol2 !== null) { n2 = mol2 * NA; changed = true; }
 
+            // 3. 几何换算
             if (V_nm3 === null && L !== null) { V_nm3 = Math.pow(L, 3); changed = true; }
             if (L === null && V_nm3 !== null) { L = Math.cbrt(V_nm3); changed = true; }
 
-            if (m1 !== null && m2 !== null) {
+            // 4. 【关键修改】如果同时有了总质量 (m1 + m2) 和体积 (V_nm3)，优先求解密度 rho
+            if (m1 !== null && m2 !== null && V_nm3 !== null && rho === null) {
                 const m_total = m1 + m2;
-                const V_cm3 = m_total / rho;
-                if (V_nm3 === null) {
-                    V_nm3 = V_cm3 * 1e21;
-                    changed = true;
-                }
+                const V_cm3 = V_nm3 / 1e21;
+                rho = m_total / V_cm3;
+                changed = true;
             }
 
-            if (V_nm3 !== null) {
+            // 5. 如果没有得到密度，且无法推导密度，则退而求其次使用默认密度 1.0
+            if (rho === null && (m1 === null || m2 === null || V_nm3 === null)) {
+                rho = 1.0;
+                changed = true;
+            }
+
+            // 6. 基于密度 rho 求解未知量
+            if (m1 !== null && m2 !== null && V_nm3 === null && rho !== null) {
+                const m_total = m1 + m2;
+                const V_cm3 = m_total / rho;
+                V_nm3 = V_cm3 * 1e21;
+                changed = true;
+            }
+
+            if (V_nm3 !== null && rho !== null) {
                 const m_total = (V_nm3 / 1e21) * rho;
                 if (m1 !== null && m2 === null) { m2 = m_total - m1; changed = true; }
                 else if (m2 !== null && m1 === null) { m1 = m_total - m2; changed = true; }
             }
 
+            // 7. 质量分数计算
             if (w_permil !== null) {
                 const w = w_permil / 1000.0;
                 if (m1 !== null && m2 === null) { m2 = m1 * (1 - w) / w; changed = true; }
                 else if (m2 !== null && m1 === null) { m1 = m2 * w / (1 - w); changed = true; }
-                else if (V_nm3 !== null && m1 === null) {
+                else if (V_nm3 !== null && m1 === null && rho !== null) {
                     const m_total = (V_nm3 / 1e21) * rho;
                     m1 = m_total * w;
                     changed = true;
@@ -402,6 +425,7 @@
                 changed = true;
             }
 
+            // 8. 摩尔浓度计算
             if (c !== null) {
                 if (V_nm3 !== null && mol1 === null) {
                     mol1 = c * (V_nm3 * 1e-24);
@@ -409,7 +433,7 @@
                 } else if (mol1 !== null && V_nm3 === null) {
                     V_nm3 = (mol1 / c) * 1e24;
                     changed = true;
-                } else if (m2 !== null && m1 === null) {
+                } else if (m2 !== null && m1 === null && rho !== null) {
                     const denom = 1000.0 * rho - c * mw1;
                     if (denom > 0) {
                         m1 = (c * mw1 * m2) / denom;
