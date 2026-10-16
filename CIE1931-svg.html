@@ -1029,7 +1029,8 @@ function draw() {
 
             svg.appendChild(createSvgElement('path', {
                 'd': gamutD,
-                'fill': `${g.color}1a`,
+                //'fill': `${g.color}1a`,  //色域叠加使用的是带有透明度的填充,会导致在ppt等软件中渲染出错（黑色区域）
+                'fill': 'none',
                 'stroke': g.color,
                 'stroke-width': '2',
                 'stroke-dasharray': '4 2'
